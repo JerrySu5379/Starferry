@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "starferry"
+version = "0.1.0"
+description = "FastAPI-based API service that generates custom bingo game items using multiple AI providers"
+readme = "README.md"
+authors = [
+    {name = "JerrySu5379", email = "jerrysu5379@gmail.com"},
+]
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "fastapi>=0.95.0",
+    # Add all your dependencies from requirements.txt here
+]
+requires-python = ">=3.10"
+
+[project.urls]
+"Homepage" = "https://github.com/JerrySu5379/Starferry"
+"Bug Tracker" = "https://github.com/JerrySu5379/Starferry/issues"
