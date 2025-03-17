@@ -3,3 +3,4 @@ uvicorn
 openai
 python-dotenv
 google-generativeai
+httpx==0.25.0

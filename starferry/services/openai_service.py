@@ -1,7 +1,8 @@
 import os
 from typing import Optional, Dict, Any, List
 from openai import OpenAI
-from src.utils import format_conversation_history
+from starferry.utils import format_conversation_history
+from fastapi.responses import StreamingResponse
 
 class OpenAIService:
     def __init__(self):
@@ -22,13 +23,13 @@ class OpenAIService:
         model: str = "gpt-4o-mini",
         conversation_history: List[Dict[str, Any]] = None,
         **kwargs
-    ) -> Optional[str]:
+    ) -> StreamingResponse:
         try:
-            params = {**self.default_params, **kwargs}
+            params = {**self.default_params, **kwargs, "stream": True}
             messages = [
                 {
                     "role": "system",
-                    "content": [{"text": system_prompt}]
+                    "content": system_prompt
                 }
             ]
             if conversation_history:
@@ -36,15 +37,24 @@ class OpenAIService:
             messages.append(
                 {
                     "role": "user",
-                    "content": [{"text": user_prompt, "type": "text"}]
+                    "content": user_prompt
                 }
             )
-            response = self.client.chat.completions.create(
-                model=model,
-                messages=messages,
-                **params
-            )
-            return response.choices[0].message.content
+            
+            def stream_response():
+                full_response = ""
+                for chunk in self.client.chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    **params
+                ):
+                    if chunk.choices[0].delta.content:
+                        full_response += chunk.choices[0].delta.content
+                        yield chunk.choices[0].delta.content
+                
+                yield "[DONE]"
+            
+            return StreamingResponse(stream_response(), media_type="text/event-stream")
         except Exception as e:
             print(f"Error in OpenAI completion: {str(e)}")
-            return None
+            return StreamingResponse(content="Error: " + str(e), media_type="text/plain")

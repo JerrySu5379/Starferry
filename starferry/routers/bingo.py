@@ -1,11 +1,11 @@
 from typing import Optional
 from fastapi import APIRouter, Request, Form
 from pydantic import BaseModel
-from src.services.openai_service import OpenAIService
-from src.services.gemini_service import GeminiService
-from src.services.grok_service import GrokService
+from starferry.services.openai_service import OpenAIService
+from starferry.services.gemini_service import GeminiService
+from starferry.services.grok_service import GrokService
 import asyncio
-from src.utils.ip_tracker import track_ip  # Updated import
+from starferry.utils.ip_tracker import track_ip  # Updated import
 
 class BingoRequest(BaseModel):
     prompt: str
