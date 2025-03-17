@@ -10,6 +10,7 @@ import asyncio
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 import json
+from typing import Optional, List, Dict, Any, Union
 
 logger = logging.getLogger(__name__)
 
@@ -67,19 +68,308 @@ class TradingViewClient:
         except Exception as e:
             logger.error(f"Error getting chart data: {str(e)}")
             return {"error": str(e)}
+            
+    # New methods for additional endpoints
+    
+    async def get_simple_chart(self, symbol, timeframe="D", chart_type=None):
+        """Get a simple chart with customizable parameters"""
+        try:
+            params = {
+                "symbol": symbol,
+                "timeframe": timeframe
+            }
+            if chart_type:
+                params["chartType"] = chart_type
+                
+            response = await self.client.get(f"{self.api_url}/simpleChart", params=params)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting simple chart: {str(e)}")
+            return {"error": str(e)}
+    
+    async def get_replay_mode(self, symbol, timeframe="D", start_from=None, steps=None):
+        """Get data using replay mode"""
+        try:
+            params = {
+                "symbol": symbol,
+                "timeframe": timeframe
+            }
+            if start_from:
+                params["startFrom"] = start_from
+            if steps:
+                params["steps"] = steps
+                
+            response = await self.client.get(f"{self.api_url}/replayMode", params=params)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting replay mode data: {str(e)}")
+            return {"error": str(e)}
+    
+    async def login(self, username, password):
+        """Login to TradingView"""
+        try:
+            data = {
+                "username": username,
+                "password": password
+            }
+            response = await self.client.post(f"{self.api_url}/login", json=data)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error logging in: {str(e)}")
+            return {"error": str(e)}
+    
+    async def search(self, query, exchange=None):
+        """Search for symbols"""
+        try:
+            params = {
+                "query": query
+            }
+            if exchange:
+                params["exchange"] = exchange
+                
+            response = await self.client.get(f"{self.api_url}/search", params=params)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error searching: {str(e)}")
+            return {"error": str(e)}
+    
+    async def get_drawings(self, symbol):
+        """Get drawings for a symbol"""
+        try:
+            params = {
+                "symbol": symbol
+            }
+            response = await self.client.get(f"{self.api_url}/drawings", params=params)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting drawings: {str(e)}")
+            return {"error": str(e)}
+    
+    async def get_from_to_data(self, symbol, timeframe="D", from_timestamp=None, to_timestamp=None):
+        """Get data for a specific time range"""
+        try:
+            params = {
+                "symbol": symbol,
+                "timeframe": timeframe
+            }
+            if from_timestamp:
+                params["from"] = from_timestamp
+            if to_timestamp:
+                params["to"] = to_timestamp
+                
+            response = await self.client.get(f"{self.api_url}/fromToData", params=params)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting from-to data: {str(e)}")
+            return {"error": str(e)}
+    
+    async def get_built_in_indicator(self, symbol, indicator, timeframe="D", options=None):
+        """Get built-in indicator data"""
+        try:
+            params = {
+                "symbol": symbol,
+                "indicator": indicator,
+                "timeframe": timeframe
+            }
+            if options:
+                params["options"] = json.dumps(options)
+                
+            response = await self.client.get(f"{self.api_url}/builtInIndicator", params=params)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting built-in indicator: {str(e)}")
+            return {"error": str(e)}
+    
+    async def get_custom_timeframe(self, symbol, timeframe):
+        """Get data for a custom timeframe"""
+        try:
+            params = {
+                "symbol": symbol,
+                "timeframe": timeframe
+            }
+            response = await self.client.get(f"{self.api_url}/customTimeframe", params=params)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting custom timeframe data: {str(e)}")
+            return {"error": str(e)}
+    
+    async def get_graphic_indicator(self, symbol, indicator, timeframe="D", options=None):
+        """Get graphic indicator data"""
+        try:
+            params = {
+                "symbol": symbol,
+                "indicator": indicator,
+                "timeframe": timeframe
+            }
+            if options:
+                params["options"] = json.dumps(options)
+                
+            response = await self.client.get(f"{self.api_url}/graphicIndicator", params=params)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting graphic indicator: {str(e)}")
+            return {"error": str(e)}
+    
+    async def get_multiple_sync_fetch(self, symbols, timeframe="D"):
+        """Get data for multiple symbols"""
+        try:
+            if isinstance(symbols, list):
+                symbols = ",".join(symbols)
+                
+            params = {
+                "symbols": symbols,
+                "timeframe": timeframe
+            }
+            response = await self.client.get(f"{self.api_url}/multipleSyncFetch", params=params)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting multiple sync fetch data: {str(e)}")
+            return {"error": str(e)}
+    
+    async def get_custom_chart_type(self, symbol, chart_type, timeframe="D"):
+        """Get data with a custom chart type"""
+        try:
+            params = {
+                "symbol": symbol,
+                "chartType": chart_type,
+                "timeframe": timeframe
+            }
+            response = await self.client.get(f"{self.api_url}/customChartType", params=params)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting custom chart type data: {str(e)}")
+            return {"error": str(e)}
+    
+    async def get_fake_replay_mode(self, symbol, timeframe="D", bars=None):
+        """Get data using fake replay mode"""
+        try:
+            params = {
+                "symbol": symbol,
+                "timeframe": timeframe
+            }
+            if bars:
+                params["bars"] = bars
+                
+            response = await self.client.get(f"{self.api_url}/fakeReplayMode", params=params)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting fake replay mode data: {str(e)}")
+            return {"error": str(e)}
+    
+    async def get_private_indicators(self):
+        """Get all private indicators"""
+        try:
+            response = await self.client.get(f"{self.api_url}/privateIndicators")
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting private indicators: {str(e)}")
+            return {"error": str(e)}
+    
+    async def manage_pine_permission(self, username, script_id, action):
+        """Manage Pine script permissions"""
+        try:
+            data = {
+                "username": username,
+                "scriptId": script_id,
+                "action": action
+            }
+            response = await self.client.post(f"{self.api_url}/pinePermission", json=data)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error managing pine permission: {str(e)}")
+            return {"error": str(e)}
+    
+    async def get_error_handling(self, error_type):
+        """Get error handling information"""
+        try:
+            params = {
+                "errorType": error_type
+            }
+            response = await self.client.get(f"{self.api_url}/errorHandling", params=params)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error getting error handling info: {str(e)}")
+            return {"error": str(e)}
 
 # Global client instance
 tv_client = None
 
 # Request models
 class SymbolRequest(BaseModel):
-    exchange: str = None
+    exchange: Optional[str] = None
 
 class ChartDataRequest(BaseModel):
     symbol: str
     interval: str = "1D"
-    range_from: str = None
-    range_to: str = None
+    range_from: Optional[str] = None
+    range_to: Optional[str] = None
+
+# New request models for additional endpoints
+class SimpleChartRequest(BaseModel):
+    symbol: str
+    timeframe: str = "D"
+    chart_type: Optional[str] = None
+
+class ReplayModeRequest(BaseModel):
+    symbol: str
+    timeframe: str = "D"
+    start_from: Optional[int] = None
+    steps: Optional[int] = None
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class SearchRequest(BaseModel):
+    query: str
+    exchange: Optional[str] = None
+
+class DrawingsRequest(BaseModel):
+    symbol: str
+
+class FromToDataRequest(BaseModel):
+    symbol: str
+    timeframe: str = "D"
+    from_timestamp: Optional[int] = None
+    to_timestamp: Optional[int] = None
+
+class IndicatorRequest(BaseModel):
+    symbol: str
+    indicator: str
+    timeframe: str = "D"
+    options: Optional[Dict[str, Any]] = None
+
+class CustomTimeframeRequest(BaseModel):
+    symbol: str
+    timeframe: str
+
+class GraphicIndicatorRequest(BaseModel):
+    symbol: str
+    indicator: str
+    timeframe: str = "D"
+    options: Optional[Dict[str, Any]] = None
+
+class MultipleSyncFetchRequest(BaseModel):
+    symbols: Union[List[str], str]
+    timeframe: str = "D"
+
+class CustomChartTypeRequest(BaseModel):
+    symbol: str
+    chart_type: str
+    timeframe: str = "D"
+
+class FakeReplayModeRequest(BaseModel):
+    symbol: str
+    timeframe: str = "D"
+    bars: Optional[int] = None
+
+class PinePermissionRequest(BaseModel):
+    username: str
+    script_id: str
+    action: str
+
+class ErrorHandlingRequest(BaseModel):
+    error_type: str
 
 # Plugin routes
 @router.get("/status")
@@ -110,6 +400,190 @@ async def get_chart_data(request: ChartDataRequest):
         request.range_from, 
         request.range_to
     )
+    return result
+
+# New routes for additional endpoints
+@router.post("/simpleChart")
+async def simple_chart(request: SimpleChartRequest):
+    """Get a simple chart with customizable parameters"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.get_simple_chart(
+        request.symbol,
+        request.timeframe,
+        request.chart_type
+    )
+    return result
+
+@router.post("/replayMode")
+async def replay_mode(request: ReplayModeRequest):
+    """Get data using replay mode"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.get_replay_mode(
+        request.symbol,
+        request.timeframe,
+        request.start_from,
+        request.steps
+    )
+    return result
+
+@router.post("/login")
+async def login(request: LoginRequest):
+    """Login to TradingView"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.login(
+        request.username,
+        request.password
+    )
+    return result
+
+@router.post("/search")
+async def search(request: SearchRequest):
+    """Search for symbols"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.search(
+        request.query,
+        request.exchange
+    )
+    return result
+
+@router.post("/drawings")
+async def drawings(request: DrawingsRequest):
+    """Get drawings for a symbol"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.get_drawings(request.symbol)
+    return result
+
+@router.post("/fromToData")
+async def from_to_data(request: FromToDataRequest):
+    """Get data for a specific time range"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.get_from_to_data(
+        request.symbol,
+        request.timeframe,
+        request.from_timestamp,
+        request.to_timestamp
+    )
+    return result
+
+@router.post("/builtInIndicator")
+async def built_in_indicator(request: IndicatorRequest):
+    """Get built-in indicator data"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.get_built_in_indicator(
+        request.symbol,
+        request.indicator,
+        request.timeframe,
+        request.options
+    )
+    return result
+
+@router.post("/customTimeframe")
+async def custom_timeframe(request: CustomTimeframeRequest):
+    """Get data for a custom timeframe"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.get_custom_timeframe(
+        request.symbol,
+        request.timeframe
+    )
+    return result
+
+@router.post("/graphicIndicator")
+async def graphic_indicator(request: GraphicIndicatorRequest):
+    """Get graphic indicator data"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.get_graphic_indicator(
+        request.symbol,
+        request.indicator,
+        request.timeframe,
+        request.options
+    )
+    return result
+
+@router.post("/multipleSyncFetch") 
+async def multiple_sync_fetch(request: MultipleSyncFetchRequest):
+    """Get data for multiple symbols"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.get_multiple_sync_fetch(
+        request.symbols,
+        request.timeframe
+    )
+    return result
+
+@router.post("/customChartType")
+async def custom_chart_type(request: CustomChartTypeRequest):
+    """Get data with a custom chart type"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.get_custom_chart_type(
+        request.symbol,
+        request.chart_type,
+        request.timeframe
+    )
+    return result
+
+@router.post("/fakeReplayMode")
+async def fake_replay_mode(request: FakeReplayModeRequest):
+    """Get data using fake replay mode"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.get_fake_replay_mode(
+        request.symbol,
+        request.timeframe,
+        request.bars
+    )
+    return result
+
+@router.get("/privateIndicators")
+async def private_indicators():
+    """Get all private indicators"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.get_private_indicators()
+    return result
+
+@router.post("/pinePermission")
+async def pine_permission(request: PinePermissionRequest):
+    """Manage Pine script permissions"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.manage_pine_permission(
+        request.username,
+        request.script_id,
+        request.action
+    )
+    return result
+
+@router.post("/errorHandling")
+async def error_handling(request: ErrorHandlingRequest):
+    """Get error handling information"""
+    if not tv_client or not tv_client.connected:
+        raise HTTPException(status_code=503, detail="TradingView API not connected")
+    
+    result = await tv_client.get_error_handling(request.error_type)
     return result
 
 async def setup(app):
